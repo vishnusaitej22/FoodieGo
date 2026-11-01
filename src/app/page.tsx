@@ -1,12 +1,30 @@
+import Hero from "@/components/home/Hero";
+import CategoryStrip from "@/components/home/CategoryStrip";
+import RestaurantSection from "@/components/home/RestaurantSection";
+import { restaurants } from "@/lib/demo-data";
+
 export default function Home() {
+  const topRated = [...restaurants]
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 4);
+  const withOffers = restaurants.filter((r) => r.offer);
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-orange-50">
-      <div className="text-center">
-        <h1 className="text-5xl font-bold text-orange-600">FoodieGo</h1>
-        <p className="mt-3 text-lg text-gray-600">
-          Delicious food, delivered fast.
-        </p>
-      </div>
-    </main>
+    <>
+      <Hero />
+      <CategoryStrip />
+      <RestaurantSection
+        id="restaurants"
+        title="Top-rated restaurants"
+        subtitle="Demo data: fictional restaurants and ratings."
+        restaurants={topRated}
+      />
+      <RestaurantSection
+        id="offers"
+        title="Special offers"
+        restaurants={withOffers}
+      />
+      <RestaurantSection title="All restaurants" restaurants={restaurants} />
+    </>
   );
 }
