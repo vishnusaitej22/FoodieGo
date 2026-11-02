@@ -4,8 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { MapPin, Menu, ShoppingCart, User, X } from "lucide-react";
 import Logo from "./Logo";
+import { logout } from "@/app/auth/actions";
 
-export default function Navbar() {
+type NavUser = { fullName: string; email: string } | null;
+
+export default function Navbar({ user }: { user: NavUser }) {
+  const displayName = user ? user.fullName.split(" ")[0] || "Account" : "";
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -39,13 +43,33 @@ export default function Navbar() {
           >
             Offers
           </a>
-          <Link
-            href="/"
-            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100"
-          >
-            <User size={18} aria-hidden="true" />
-            Log in
-          </Link>
+          {user ? (
+            <>
+              <Link
+                href="/account"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100"
+              >
+                <User size={18} aria-hidden="true" />
+                {displayName}
+              </Link>
+              <form action={logout}>
+                <button
+                  type="submit"
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100"
+                >
+                  Log out
+                </button>
+              </form>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100"
+            >
+              <User size={18} aria-hidden="true" />
+              Log in
+            </Link>
+          )}
           <button
             type="button"
             className="relative flex items-center gap-2 rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
@@ -89,12 +113,33 @@ export default function Navbar() {
             >
               Offers
             </a>
-            <Link
-              href="/"
-              className="rounded-lg px-3 py-2 font-medium text-stone-700 hover:bg-stone-100"
-            >
-              Log in
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  href="/account"
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-lg px-3 py-2 font-medium text-stone-700 hover:bg-stone-100"
+                >
+                  My account ({displayName})
+                </Link>
+                <form action={logout}>
+                  <button
+                    type="submit"
+                    className="w-full rounded-lg px-3 py-2 text-left font-medium text-stone-700 hover:bg-stone-100"
+                  >
+                    Log out
+                  </button>
+                </form>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-lg px-3 py-2 font-medium text-stone-700 hover:bg-stone-100"
+              >
+                Log in
+              </Link>
+            )}
             <button
               type="button"
               className="mt-1 flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-2 font-semibold text-white"
