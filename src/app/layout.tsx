@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Suspense } from "react";
 import Navbar from "@/components/layout/Navbar";
 import NavbarWithUser from "@/components/layout/NavbarWithUser";
 import Footer from "@/components/layout/Footer";
@@ -26,13 +26,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-    <html
-      lang="en"
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-></html>
+    >
       <body className="flex min-h-full flex-col bg-white text-stone-900">
         <Suspense fallback={<Navbar user={null} />}>
           <NavbarWithUser />

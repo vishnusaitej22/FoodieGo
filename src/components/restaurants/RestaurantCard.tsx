@@ -1,18 +1,24 @@
+import Link from "next/link";
 import { Clock, Leaf, Star } from "lucide-react";
-import type { Restaurant } from "@/lib/demo-data";
+import type { Restaurant } from "@/lib/types";
+import { formatINR, visualFor } from "@/lib/format";
 
 export default function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
+  const visual = visualFor(restaurant.cuisines);
+
   return (
-    <article className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 transition hover:-translate-y-1 hover:shadow-lg">
-      {/* Image area: a colourful placeholder for now. Real photos come in Phase 5. */}
+    <Link
+      href={`/restaurants/${restaurant.slug}`}
+      className="group block overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 transition hover:-translate-y-1 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-orange-500"
+    >
       <div
-        className={`relative flex h-40 items-center justify-center text-6xl ${restaurant.gradient}`}
+        className={`relative flex h-40 items-center justify-center text-6xl ${visual.gradient}`}
         aria-hidden="true"
       >
-        {restaurant.emoji}
-        {restaurant.offer && (
+        {visual.emoji}
+        {restaurant.offerText && (
           <span className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-3 pb-2 pt-6 text-left text-sm font-bold text-white">
-            {restaurant.offer}
+            {restaurant.offerText}
           </span>
         )}
       </div>
@@ -25,17 +31,13 @@ export default function RestaurantCard({ restaurant }: { restaurant: Restaurant 
             {restaurant.rating.toFixed(1)}
           </span>
         </div>
-
-        <p className="mt-1 text-sm text-stone-500">
-          {restaurant.cuisines.join(", ")}
-        </p>
-
-        <div className="mt-3 flex items-center gap-3 text-xs text-stone-600">
+        <p className="mt-1 text-sm text-stone-500">{restaurant.cuisines.join(", ")}</p>
+        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-600">
           <span className="flex items-center gap-1">
             <Clock size={14} aria-hidden="true" />
             {restaurant.deliveryMinutes} mins
           </span>
-          <span>Min order ₹{restaurant.minOrder}</span>
+          <span>Min order {formatINR(restaurant.minOrder)}</span>
           {restaurant.isVeg && (
             <span className="flex items-center gap-1 font-medium text-green-700">
               <Leaf size={14} aria-hidden="true" />
@@ -44,6 +46,6 @@ export default function RestaurantCard({ restaurant }: { restaurant: Restaurant 
           )}
         </div>
       </div>
-    </article>
+    </Link>
   );
 }

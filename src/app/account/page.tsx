@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser, isCurrentUserAdmin } from "@/lib/auth";
 
@@ -31,6 +32,11 @@ export default function AccountPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-12">
       <h1 className="text-3xl font-extrabold text-stone-900">My account</h1>
+      <p className="mt-2">
+        <Link href="/orders" className="font-semibold text-orange-600 hover:underline">
+          View my orders
+        </Link>
+      </p>
       <Suspense fallback={<div className="mt-6 h-40 animate-pulse rounded-2xl bg-stone-100" />}>
         <AccountDetails />
       </Suspense>

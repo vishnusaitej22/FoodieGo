@@ -5,12 +5,14 @@ import Link from "next/link";
 import { MapPin, Menu, ShoppingCart, User, X } from "lucide-react";
 import Logo from "./Logo";
 import { logout } from "@/app/auth/actions";
+import { useCartCount } from "@/lib/cart-store";
 
 type NavUser = { fullName: string; email: string } | null;
 
 export default function Navbar({ user }: { user: NavUser }) {
   const displayName = user ? user.fullName.split(" ")[0] || "Account" : "";
   const [menuOpen, setMenuOpen] = useState(false);
+  const cartCount = useCartCount();
 
   return (
     <header className="sticky top-0 z-50 border-b border-stone-200 bg-white/90 backdrop-blur">
@@ -31,18 +33,18 @@ export default function Navbar({ user }: { user: NavUser }) {
 
         {/* Desktop links */}
         <div className="hidden items-center gap-2 md:flex">
-          <a
-            href="#restaurants"
+          <Link
+            href="/restaurants"
             className="rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100"
           >
             Restaurants
-          </a>
-          <a
-            href="#offers"
+          </Link>
+          <Link
+            href="/restaurants?offers=1"
             className="rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100"
           >
             Offers
-          </a>
+          </Link>
           {user ? (
             <>
               <Link
@@ -51,6 +53,12 @@ export default function Navbar({ user }: { user: NavUser }) {
               >
                 <User size={18} aria-hidden="true" />
                 {displayName}
+              </Link>
+              <Link
+                href="/orders"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100"
+              >
+                My orders
               </Link>
               <form action={logout}>
                 <button
@@ -70,17 +78,17 @@ export default function Navbar({ user }: { user: NavUser }) {
               Log in
             </Link>
           )}
-          <button
-            type="button"
+          <Link
+            href="/cart"
             className="relative flex items-center gap-2 rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
-            aria-label="Cart, 0 items"
+            aria-label={`Cart, ${cartCount} items`}
           >
             <ShoppingCart size={18} aria-hidden="true" />
             Cart
             <span className="rounded-full bg-white px-2 text-xs font-bold text-orange-600">
-              0
+              {cartCount}
             </span>
-          </button>
+          </Link>
         </div>
 
         {/* Mobile menu button */}
@@ -99,20 +107,20 @@ export default function Navbar({ user }: { user: NavUser }) {
       {menuOpen && (
         <div className="border-t border-stone-200 bg-white px-4 py-3 md:hidden">
           <div className="flex flex-col gap-1">
-            <a
-              href="#restaurants"
+            <Link
+              href="/restaurants"
               onClick={() => setMenuOpen(false)}
               className="rounded-lg px-3 py-2 font-medium text-stone-700 hover:bg-stone-100"
             >
               Restaurants
-            </a>
-            <a
-              href="#offers"
+            </Link>
+            <Link
+              href="/restaurants?offers=1"
               onClick={() => setMenuOpen(false)}
               className="rounded-lg px-3 py-2 font-medium text-stone-700 hover:bg-stone-100"
             >
               Offers
-            </a>
+            </Link>
             {user ? (
               <>
                 <Link
@@ -121,6 +129,13 @@ export default function Navbar({ user }: { user: NavUser }) {
                   className="rounded-lg px-3 py-2 font-medium text-stone-700 hover:bg-stone-100"
                 >
                   My account ({displayName})
+                </Link>
+                <Link
+                  href="/orders"
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-lg px-3 py-2 font-medium text-stone-700 hover:bg-stone-100"
+                >
+                  My orders
                 </Link>
                 <form action={logout}>
                   <button
@@ -140,13 +155,14 @@ export default function Navbar({ user }: { user: NavUser }) {
                 Log in
               </Link>
             )}
-            <button
-              type="button"
+            <Link
+              href="/cart"
+              onClick={() => setMenuOpen(false)}
               className="mt-1 flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-2 font-semibold text-white"
             >
               <ShoppingCart size={18} aria-hidden="true" />
-              Cart (0)
-            </button>
+              Cart ({cartCount})
+            </Link>
           </div>
         </div>
       )}
