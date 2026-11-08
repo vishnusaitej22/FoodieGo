@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { orderErrorMessage } from "@/lib/messages";
+import { parseAddressForm } from "@/lib/address";
 import type { Quote } from "@/lib/types";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -114,25 +115,9 @@ export async function placeOrder(
 export type AddressState = { error?: string; id?: string };
 
 export async function addAddress(_prev: AddressState, formData: FormData): Promise<AddressState> {
-  const get = (name: string) => String(formData.get(name) ?? "").trim();
-
-  const label = get("label") || "Home";
-  const recipientName = get("recipientName");
-  const phone = get("phone");
-  const line1 = get("line1");
-  const line2 = get("line2");
-  const city = get("city");
-  const state = get("state");
-  const pincode = get("pincode");
-
-  if (!["Home", "Work", "Other"].includes(label)) return { error: "Please choose a valid label." };
-  if (recipientName.length < 1 || recipientName.length > 100) return { error: "Please enter the receiver's name." };
-  if (!/^[0-9+ ()-]{7,15}$/.test(phone)) return { error: "Please enter a valid phone number (7 to 15 digits)." };
-  if (line1.length < 1 || line1.length > 200) return { error: "Please enter your house or street address." };
-  if (line2.length > 200) return { error: "The second address line is too long." };
-  if (city.length < 1 || city.length > 80) return { error: "Please enter your city." };
-  if (state.length < 1 || state.length > 80) return { error: "Please enter your state." };
-  if (!/^[1-9][0-9]{5}$/.test(pincode)) return { error: "Please enter a valid 6-digit pincode." };
+  const parsed = parseAddressForm(formData);
+  if (!parsed.value) return { error: parsed.error };
+  const a = parsed.value;
 
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getUser();
@@ -147,14 +132,14 @@ export async function addAddress(_prev: AddressState, formData: FormData): Promi
     .from("user_addresses")
     .insert({
       user_id: auth.user.id,
-      label,
-      recipient_name: recipientName,
-      phone,
-      line1,
-      line2: line2 || null,
-      city,
-      state,
-      pincode,
+      label: a.label,
+      recipient_name: a.recipientName,
+      phone: a.phone,
+      line1: a.line1,
+      line2: a.line2 || null,
+      city: a.city,
+      state: a.state,
+      pincode: a.pincode,
       is_default: (count ?? 0) === 0,
     })
     .select("id")

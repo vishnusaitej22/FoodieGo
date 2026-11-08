@@ -5,6 +5,8 @@ import { CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatINR } from "@/lib/format";
 import { STATUS_LABEL, STATUS_STYLE } from "@/lib/order-status";
+import OrderTracker from "@/components/orders/OrderTracker";
+import CancelOrderButton from "@/components/orders/CancelOrderButton";
 
 export const metadata = { title: "Order details | FoodieGo" };
 
@@ -70,6 +72,8 @@ async function OrderDetails({ params, searchParams }: { params: Params; searchPa
           </span>
         </div>
 
+        <OrderTracker status={o.status} />
+
         <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-stone-500">Payment method</dt>
@@ -77,7 +81,11 @@ async function OrderDetails({ params, searchParams }: { params: Params; searchPa
           </div>
           <div>
             <dt className="text-stone-500">Payment status</dt>
-            <dd className="font-medium">{PAYMENT_LABEL[o.payment_status] ?? o.payment_status}</dd>
+            <dd className="font-medium">
+              {o.status === "cancelled" && o.payment_status === "pending"
+                ? "Not applicable (order cancelled)"
+                : (PAYMENT_LABEL[o.payment_status] ?? o.payment_status)}
+            </dd>
           </div>
           <div className="sm:col-span-2">
             <dt className="text-stone-500">Delivering to</dt>
@@ -114,6 +122,8 @@ async function OrderDetails({ params, searchParams }: { params: Params; searchPa
           <div className="flex justify-between border-t border-stone-200 pt-2 text-base font-bold"><dt>Total</dt><dd>{formatINR(Number(o.total_amount))}</dd></div>
         </dl>
       </div>
+
+      {o.status === "pending" && <CancelOrderButton orderId={o.id} />}
 
       <p className="mt-6 text-center">
         <Link href="/orders" className="font-semibold text-orange-600 hover:underline">

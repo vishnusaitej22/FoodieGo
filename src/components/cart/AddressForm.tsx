@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 import { addAddress, type AddressState } from "@/app/checkout/actions";
+import { updateAddress } from "@/app/account/actions";
+import type { Address } from "@/lib/types";
 
 const inputClass =
   "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-stone-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200";
@@ -9,13 +11,17 @@ const inputClass =
 export default function AddressForm({
   onAdded,
   onCancel,
+  initial,
 }: {
   onAdded: (id: string) => void;
   onCancel: () => void;
+  initial?: Address; // when given, the form edits this address
 }) {
   const [state, formAction, pending] = useActionState<AddressState, FormData>(
     async (prev, formData) => {
-      const result = await addAddress(prev, formData);
+      const result = initial
+        ? await updateAddress(initial.id, prev, formData)
+        : await addAddress(prev, formData);
       if (result.id) onAdded(result.id);
       return result;
     },
@@ -32,29 +38,29 @@ export default function AddressForm({
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="text-sm text-stone-700">
           Receiver&apos;s name
-          <input name="recipientName" required maxLength={100} autoComplete="name" className={inputClass} />
+          <input name="recipientName" required maxLength={100} autoComplete="name" defaultValue={initial?.recipientName} className={inputClass} />
         </label>
         <label className="text-sm text-stone-700">
           Phone number
-          <input name="phone" required type="tel" maxLength={15} autoComplete="tel" className={inputClass} />
+          <input name="phone" required type="tel" maxLength={15} autoComplete="tel" defaultValue={initial?.phone} className={inputClass} />
         </label>
       </div>
       <label className="block text-sm text-stone-700">
         House / street address
-        <input name="line1" required maxLength={200} autoComplete="address-line1" className={inputClass} />
+        <input name="line1" required maxLength={200} autoComplete="address-line1" defaultValue={initial?.line1} className={inputClass} />
       </label>
       <label className="block text-sm text-stone-700">
         Area / landmark (optional)
-        <input name="line2" maxLength={200} autoComplete="address-line2" className={inputClass} />
+        <input name="line2" maxLength={200} autoComplete="address-line2" defaultValue={initial?.line2 ?? ""} className={inputClass} />
       </label>
       <div className="grid gap-3 sm:grid-cols-3">
         <label className="text-sm text-stone-700">
           City
-          <input name="city" required maxLength={80} autoComplete="address-level2" className={inputClass} />
+          <input name="city" required maxLength={80} autoComplete="address-level2" defaultValue={initial?.city} className={inputClass} />
         </label>
         <label className="text-sm text-stone-700">
           State
-          <input name="state" required maxLength={80} autoComplete="address-level1" className={inputClass} />
+          <input name="state" required maxLength={80} autoComplete="address-level1" defaultValue={initial?.state} className={inputClass} />
         </label>
         <label className="text-sm text-stone-700">
           Pincode
@@ -64,6 +70,7 @@ export default function AddressForm({
             inputMode="numeric"
             pattern="[1-9][0-9]{5}"
             maxLength={6}
+            defaultValue={initial?.pincode}
             autoComplete="postal-code"
             className={inputClass}
           />
@@ -71,7 +78,7 @@ export default function AddressForm({
       </div>
       <label className="block text-sm text-stone-700">
         Save as
-        <select name="label" defaultValue="Home" className={inputClass}>
+        <select name="label" defaultValue={initial?.label ?? "Home"} className={inputClass}>
           <option>Home</option>
           <option>Work</option>
           <option>Other</option>

@@ -26,3 +26,13 @@ export function orderErrorMessage(raw: string): string {
   if (m) return issueMessage(m[1]);
   return "We could not place your order. Please try again.";
 }
+
+// Turns an error from the cancel_order / address functions into friendly text.
+export function accountErrorMessage(raw: string): string {
+  if (raw.includes("CANNOT_CANCEL"))
+    return "This order cannot be cancelled any more. It may already be cancelled, or the restaurant has started preparing it.";
+  if (raw.includes("ORDER_NOT_FOUND")) return "We could not find that order.";
+  if (raw.includes("INVALID_ADDRESS")) return "We could not find that address.";
+  if (raw.includes("NOT_AUTHENTICATED")) return "Please log in first.";
+  return "Something went wrong. Please try again.";
+}
