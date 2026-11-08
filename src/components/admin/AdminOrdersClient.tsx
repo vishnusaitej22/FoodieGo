@@ -4,7 +4,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateAdminOrder } from "@/app/admin/orders/actions";
-import { STATUS_LABEL, STATUS_STYLE } from "@/lib/order-status";
+import { NEXT_STATUSES, STATUS_LABEL, STATUS_STYLE } from "@/lib/order-status";
 import { formatINR } from "@/lib/format";
 
 type AdminOrder = {
@@ -277,7 +277,10 @@ export default function AdminOrdersClient({
 
                       <select
                         value={order.status}
-                        disabled={isPending}
+                        disabled={
+                          isPending ||
+                          (NEXT_STATUSES[order.status] ?? []).length === 0
+                        }
                         onChange={(e) =>
                           updateOrder(
                             order.id,
@@ -285,14 +288,21 @@ export default function AdminOrdersClient({
                             e.target.value
                           )
                         }
-                        className="mb-5 w-full rounded-lg border border-stone-300 bg-white p-3"
+                        className="mb-1 w-full rounded-lg border border-stone-300 bg-white p-3 disabled:bg-stone-100"
                       >
-                        {statuses.map((status) => (
-                          <option key={status} value={status}>
-                            {STATUS_LABEL[status]}
-                          </option>
-                        ))}
+                        {[order.status, ...(NEXT_STATUSES[order.status] ?? [])].map(
+                          (status) => (
+                            <option key={status} value={status}>
+                              {STATUS_LABEL[status] ?? status}
+                            </option>
+                          )
+                        )}
                       </select>
+                      <p className="mb-5 text-xs text-stone-500">
+                        {(NEXT_STATUSES[order.status] ?? []).length === 0
+                          ? "This order is final. Its status cannot change."
+                          : "Orders move forward one step at a time. They can be cancelled until delivered."}
+                      </p>
 
                       <label className="mb-2 block text-sm font-medium">
                         Payment Status

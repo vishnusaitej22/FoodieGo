@@ -16,3 +16,14 @@ export const STATUS_STYLE: Record<string, string> = {
   delivered: "bg-green-100 text-green-800",
   cancelled: "bg-stone-200 text-stone-700",
 };
+
+// Which status an order may move to next. The database enforces the same rule
+// (migration 005), so this list only decides what the admin screen offers.
+export const NEXT_STATUSES: Record<string, string[]> = {
+  pending: ["confirmed", "cancelled"],
+  confirmed: ["preparing", "cancelled"],
+  preparing: ["out_for_delivery", "cancelled"],
+  out_for_delivery: ["delivered", "cancelled"],
+  delivered: [],
+  cancelled: [],
+};

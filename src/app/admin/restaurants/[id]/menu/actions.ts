@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser, isCurrentUserAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { isHttpsUrl } from "@/lib/validation";
 
 type MenuInput = {
   restaurant_id: string;
@@ -35,6 +36,9 @@ function readMenuItem(formData: FormData): MenuInput {
   }
   if (!Number.isFinite(price) || price <= 0 || price > 100000) {
     throw new Error("Enter a valid price greater than 0.");
+  }
+  if (image_url && !isHttpsUrl(image_url)) {
+    throw new Error("Image link must be a web address starting with https://");
   }
   if (description.length > 300) {
     throw new Error("Description must be under 300 characters.");

@@ -20,8 +20,7 @@ export async function login(_prev: FormState, formData: FormData): Promise<FormS
 
   if (error) {
     // Same message for wrong email or wrong password, on purpose.
-     console.error("Signup error:", error.code, error.message);
-    if (error.code === "weak_password") {
+    if (error.code === "email_not_confirmed") {
       return { error: "Please confirm your email first. Check your inbox." };
     }
     return { error: "Incorrect email or password." };
@@ -64,7 +63,7 @@ export async function signup(_prev: FormState, formData: FormData): Promise<Form
     if (error.code === "over_email_send_rate_limit") {
       return { error: "Too many sign-up emails were sent. Please wait a while and try again." };
     }
-    return { error: `Could not create your account (${error.code ?? "no code"}: ${error.message})` };
+    return { error: "Could not create your account. Please try again." };
   }
 
   // If email confirmation is ON, there is no session yet.

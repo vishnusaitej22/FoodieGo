@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser, isCurrentUserAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { isHttpsUrl } from "@/lib/validation";
 
 type RestaurantInput = {
   name: string;
@@ -46,6 +47,10 @@ function readRestaurant(formData: FormData): RestaurantInput {
 
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
     throw new Error("Slug must use lowercase letters, numbers, and single hyphens.");
+  }
+
+  if (imageUrl && !isHttpsUrl(imageUrl)) {
+    throw new Error("Image link must be a web address starting with https://");
   }
 
   if (description.length > 500 || offerText.length > 100) {

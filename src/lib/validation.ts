@@ -16,3 +16,13 @@ export function safeNextPath(next: string | null | undefined): string {
   if (!next || !next.startsWith("/") || next.startsWith("//")) return "/";
   return next;
 }
+
+// Image links must be a normal https:// web address (no javascript:, data:, etc.).
+export function isHttpsUrl(value: string): boolean {
+  if (value.length > 500) return false;
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
